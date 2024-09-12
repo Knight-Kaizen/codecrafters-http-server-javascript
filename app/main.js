@@ -1,4 +1,5 @@
 const net = require("net");
+const path = require("path");
 
 // create a tcp serverx
 const server = net.createServer((socket) => {
@@ -11,11 +12,23 @@ const server = net.createServer((socket) => {
         data = data.split('\r\n')[0];
 
         // 3. request line consists of http method at index 0, path at 1, http vetrsion at 2nd index. 
-        method = data.split(' ')[0];
-        path = data.split(' ')[1];
+        const method = data.split(' ')[0];
+        let path = data.split(' ')[1];
 
         // 4. If the path is / pass the req, else fail 
         if (path == '/') {
+            socket.write("HTTP/1.1 200 OK\r\n\r\n")
+        }
+        else if(path.includes('/echo')){
+
+            path = path.split('/');
+
+            if(path.length >= 3){
+                const str = path[2];
+                // 4. Write this in response body
+                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n\r\n${str}`);
+            }
+            else
             socket.write("HTTP/1.1 200 OK\r\n\r\n")
         }
         else
