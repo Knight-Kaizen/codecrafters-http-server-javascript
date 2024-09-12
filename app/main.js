@@ -1,6 +1,7 @@
 const net = require("net");
 const path = require("path");
 const fs = require("fs");
+const { dir } = require("console");
 
 // create a tcp serverx
 const server = net.createServer((socket) => {
@@ -50,19 +51,33 @@ const server = net.createServer((socket) => {
             }
         }
         else if (url.includes('/files')) {
-
-            const directory = process.argv[3];
-            const filename = url.split('/')[2];
-
-            const fileurl = path.join(directory, filename);
-            if(fs.existsSync(fileurl)){
-                const fileBuffer = fs.readFileSync(fileurl);
-                const content = fileBuffer.toString();
-
-                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${content.length}\r\n\r\n${content}`);
+            if(reqMethod == "GET"){
+                const directory = process.argv[3];
+                const filename = url.split('/')[2];
+    
+                const fileurl = path.join(directory, filename);
+                if(fs.existsSync(fileurl)){
+                    const fileBuffer = fs.readFileSync(fileurl);
+                    const content = fileBuffer.toString();
+    
+                    socket.write(`HTTP/1.1 200 OK\r\nContent-Type: application/octet-stream\r\nContent-Length: ${content.length}\r\n\r\n${content}`);
+                }
+                else{
+                    socket.write("HTTP/1.1 404 Not Found\r\n\r\n")
+                }
             }
-            else{
-                socket.write("HTTP/1.1 404 Not Found\r\n\r\n")
+            else if(reqMethod == "POST"){
+                const directory = process.argv[3];
+                const filename = url.split('/')[2];
+                
+                const fileurl = path.join(directory, filename);
+                if(!fs.existsSync(directory))
+                    fs.mkdirSync(directory)
+                
+                const content = reqBody;
+                fs.writeFileSync(fileurl, content);
+                
+                socket.write('HTTP/1.1 201 Created\r\n\r\n');
             }
 
         }
