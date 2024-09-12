@@ -1,6 +1,7 @@
 const net = require("net");
 const path = require("path");
 const fs = require("fs");
+const zlib = require("zlib");
 
 // create a tcp serverx
 const server = net.createServer((socket) => {
@@ -45,10 +46,20 @@ const server = net.createServer((socket) => {
             }
 
             if (url.length >= 3) {
-                const str = url[2];
+                let str = url[2];
                 // 4. Write this in response body
                 const compressionHeader = (reqCompressionHeader) ? `${resCompressionHeader}: ${reqCompressionHeaderValue}\r\n` : '';
-                socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n${compressionHeader}\r\n${str}`);
+                if (compressionHeader != '') {
+                    // compress the body using gzip
+
+                    str = zlib.gzipSync(str);
+
+                    socket.write(`HTTP/1.1 200 OK\\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n${compressionHeader}\r\n`);
+                    socket.write(str);
+
+                }
+                else
+                    socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n${compressionHeader}\r\n${str}`);
             }
             else
                 socket.write("HTTP/1.1 200 OK\r\n\r\n")
