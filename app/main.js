@@ -54,7 +54,7 @@ const server = net.createServer((socket) => {
 
                     str = zlib.gzipSync(str);
 
-                    socket.write(`HTTP/1.1 200 OK\\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n${compressionHeader}\r\n`);
+                    socket.write(`HTTP/1.1 200 OK\r\nContent-Type: text/plain\r\nContent-Length: ${str.length}\r\n${compressionHeader}\r\n`);
                     socket.write(str);
 
                 }
