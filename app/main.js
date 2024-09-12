@@ -51,10 +51,10 @@ const server = net.createServer((socket) => {
         }
         else if (url.includes('/files')) {
 
-            const directory = process.argv[3] ? process.argv[3] : "files";
+            const directory = process.argv[3];
             const filename = url.split('/')[2];
 
-            const fileurl = path.join(process.cwd(), directory, filename);
+            const fileurl = path.join(directory, filename);
             if(fs.existsSync(fileurl)){
                 const fileBuffer = fs.readFileSync(fileurl);
                 const content = fileBuffer.toString();
