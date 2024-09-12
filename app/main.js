@@ -35,11 +35,11 @@ const server = net.createServer((socket) => {
 
             for (const header of headers) {
                 const headerKey = header.split(':')[0];
-                const headerValue = header.split(' ')[1];
+                const headerValue = header.split(' ');
 
-                if (headerKey == 'Accept-Encoding' && headerValue == 'gzip') {
+                if (headerKey == 'Accept-Encoding' && headerValue.includes('gzip,')) {
                     reqCompressionHeader = headerKey;
-                    reqCompressionHeaderValue = headerValue;
+                    reqCompressionHeaderValue = 'gzip'; // hardoding gzip for now
                     resCompressionHeader = "Content-Encoding";
                 }
             }
